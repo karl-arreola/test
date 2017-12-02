@@ -11,16 +11,47 @@ body {
 
 .eventsTable {
     display: flex;
+    justify-content: center;
 }
 
-.title {
+table, tr, th, td {
+    width: 70%;
+    margin-left: 15%;
+    margin-right: 15%;
+    text-align: center;
+}
+
+th {
     background-color: #c6e2ff;
-    justify-content: center;
-    display: flex;
-    flex: 1;
+    width: 50%;
     padding: 10px;
 }
 
-table {
-    width: 100%;
+td {
+    width: 50%;  
+}
+
+td:nth-child(1) {
+    text-align: left;
+    padding-left: 15px;  
+}
+
+tr:nth-child(odd) {
+    background-color: #fff0f5;
+}
+
+.pages {
+    display: flex;
+    margin-bottom: 20px; 
+    justify-content: center;
+}
+
+.page1Button, .page2Button, .page3Button, .page4Button {
+    background-color: #fff0f5;
+    padding: 15px;
+    margin: 0px 5px; 
+}
+
+.divClose {
+    display: none;
 }

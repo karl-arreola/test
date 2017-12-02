@@ -5,6 +5,7 @@
     $link4 = "http://xomo.ca/x_testing/codeTestPage4.json";
 
     $events1 = parseJson($link1);
+    $events2 = parseJson($link2);
     
     function findTotal($event, $categoryName) {
         $ticketClasses = $event->{'ticket_classes'};
@@ -83,8 +84,12 @@
     }
 
     function listEventsData($events) {
+        //initiate table with headers
+        $eventsData = "<table><tr><th>Events</th><th>Status</th></tr>";
+
+        //table contents
         foreach($events as $event) {
-            $eventsData = "<tr><td>". $event["name"] . "</td><td>";
+            $eventsData .= "<tr><td>". $event["name"] . "</td><td>";
 
             if($event["ticketType"] == "BUY" || "RUSH") {
                 $eventsData .= "<a href='" . $event["url"] . "' target='_blank'><div class='buyButton'>". $event["ticketType"] ."</div>";
@@ -93,9 +98,12 @@
             }
 
             $eventsData .= "</td></tr>";
-
-            echo $eventsData;
         }
+
+        //close table
+        $eventsData .= "</table>";
+
+        echo $eventsData;
     }
 ?>
 
@@ -108,20 +116,29 @@
     <link href="/css/home.css" rel="stylesheet">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Dancing+Script" rel="stylesheet">
-    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <!-- Scripts --> 
+    <script src="/scripts/homeFunctions.js" type="text/javascript"></script>
 </head>
 <body>
     <div class="navbar navbar-default">
         API Test
     </div>
+
+    <div class="pages">
+        <div class="page1Button" onclick="openClose('page1')">Page 1</div>
+        <div class="page2Button" onclick="openClose('page2')">Page 2</div>
+        <div class="page3Button" onclick="openClose('page3')">Page 3</div>
+        <div class="page4Button" onclick="openClose('page4')">Page 4</div>
+    </div>
+
     <div class="eventsTable">
-        <table>
-            <tr>
-                <th>Events</th>
-                <th>Status</th>
-            </tr>
+        <div id="page1">
             <?php listEventsData($events1); ?>
-        </table>
+        </div>
+        <div class="divClose" id="page2">
+            <?php listEventsData($events2); ?>
+        </div>
     </div>
 </body>
 </html>
