@@ -4,7 +4,7 @@
     $link3 = "http://xomo.ca/x_testing/codeTestPage3.json";
     $link4 = "http://xomo.ca/x_testing/codeTestPage4.json";
 
-    parseJson($link1);
+    $events1 = parseJson($link1);
     
     function findTotal($event, $categoryName) {
         $ticketClasses = $event->{'ticket_classes'};
@@ -28,6 +28,8 @@
         } else {
             $ticketType = "RUSH";
         }
+
+        return $ticketType;
     }
 
     function parseJson($link) {
@@ -48,7 +50,7 @@
         $obj = json_decode($json);
         $events = $obj->{'events'};
         //$eventCount = 0;
-        $newEvents = [];
+        $newEvents = array();
 
         foreach ($events as $event) {
             $id = $event->{'id'};
@@ -57,9 +59,22 @@
             $capacity = findTotal($event, 'quantity_total');
             $sold = findTotal($event, 'quantity_sold');
             $ticketType = findTicketType($capacity, $sold);
+
+            $eventArray = array(
+                'id' => $id,
+                'url' => $url,
+                'name' => $name,
+                'capacity' => $capacity,
+                'sold' => $sold,
+                'ticketType' => $ticketType
+            );
+
+            array_push($newEvents, $eventArray);
         }
 
         curl_close($ch);
+
+        return $newEvents;
     }
 
     function debug($msg) {
@@ -69,7 +84,17 @@
 
     function listEventsData($events) {
         foreach($events as $event) {
-            echo "<div>" . $event->name . "</div>";
+            $eventsData = "<tr><td>". $event["name"] . "</td><td>";
+
+            if($event["ticketType"] == "BUY" || "RUSH") {
+                $eventsData .= "<a href='" . $event["url"] . "' target='_blank'><div class='buyButton'>". $event["ticketType"] ."</div>";
+            } else {
+                $eventsData .= $event["ticketType"];
+            }
+
+            $eventsData .= "</td></tr>";
+
+            echo $eventsData;
         }
     }
 ?>
@@ -90,12 +115,13 @@
         API Test
     </div>
     <div class="eventsTable">
-        <div class="events">
-            <div class="title">Events</div>
-        </div>
-        <div class="status">
-            <div class="title">Status</div>
-        </div>
+        <table>
+            <tr>
+                <th>Events</th>
+                <th>Status</th>
+            </tr>
+            <?php listEventsData($events1); ?>
+        </table>
     </div>
 </body>
 </html>

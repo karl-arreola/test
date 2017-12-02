@@ -13,20 +13,14 @@ body {
     display: flex;
 }
 
-.events {
-    display: flex;
-    flex: 1;
-}
-
-.status {
-    display: flex;
-    flex: 1;
-}
-
 .title {
     background-color: #c6e2ff;
     justify-content: center;
     display: flex;
     flex: 1;
     padding: 10px;
+}
+
+table {
+    width: 100%;
 }
