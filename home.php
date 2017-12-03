@@ -122,10 +122,10 @@
             //table contents
             foreach($events as $event) {
                 //omit row for event if name or ticketType not set
-                if(isset($event["name"]) && isset($event["ticketType"])) {
+                if (!empty($event["name"]) && !empty($event["ticketType"])) {
                     $eventsData .= "<tr><td>" . $event["name"] . "</td><td>";
 
-                    if($event["ticketType"] == "BUY" || "RUSH") {
+                    if ($event["ticketType"] == "BUY" || "RUSH") {
                         $eventsData .= "<a href='" . $event["url"] . "' target='_blank'><div class='buyButton'>". $event["ticketType"] ."</div>";
                     } else {
                         $eventsData .= $event["ticketType"];
@@ -177,9 +177,9 @@
         <div class="divClose" id="page2">
             <?php listEventsData($events2); ?>
         </div>
-        <!--<div class="divClose" id="page3">
+        <div class="divClose" id="page3">
             <?php listEventsData($events3); ?>
-        </div>-->
+        </div>
         <div class="divClose" id="page4">
             <?php listEventsData($events4); ?>
         </div>
