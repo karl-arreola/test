@@ -6,13 +6,17 @@
 
     $events1 = parseJson($link1);
     $events2 = parseJson($link2);
+    $events3 = parseJson($link3);
+    $events4 = parseJson($link4);
     
     function findTotal($event, $categoryName) {
         $ticketClasses = $event->{'ticket_classes'};
         $total = 0;
 
         foreach ($ticketClasses as $ticketClass) {
-            $total += $ticketClass->{$categoryName};
+            if(isset($ticketClass->{$categoryName})) {
+                $total += $ticketClass->{$categoryName};
+            }
         }
 
         return $total;
@@ -49,33 +53,60 @@
         }
 
         $obj = json_decode($json);
-        $events = $obj->{'events'};
-        //$eventCount = 0;
-        $newEvents = array();
+        
+        if(isset($obj->{'events'})) {
+            $events = $obj->{'events'};
+            //$eventCount = 0;
+            $newEvents = array();
 
-        foreach ($events as $event) {
-            $id = $event->{'id'};
-            $url = $event->{'url'};
-            $name = $event->{'name'}->{'text'};
-            $capacity = findTotal($event, 'quantity_total');
-            $sold = findTotal($event, 'quantity_sold');
-            $ticketType = findTicketType($capacity, $sold);
+            foreach ($events as $event) {
+                if(isset($event->{'id'})){
+                    $id = $event->{'id'};
+                } else {
+                    $id = "";
+                }
 
-            $eventArray = array(
-                'id' => $id,
-                'url' => $url,
-                'name' => $name,
-                'capacity' => $capacity,
-                'sold' => $sold,
-                'ticketType' => $ticketType
-            );
+                if(isset($event->{'url'})){
+                    $url = $event->{'url'};
+                } else {
+                    $url = "";
+                }
 
-            array_push($newEvents, $eventArray);
+                if(isset($event->{'name'}->{'text'})){
+                    $name = $event->{'name'}->{'text'};
+                } else {
+                    $name = "";
+                }
+
+                if(isset($event->{'ticket_classes'})){
+                    $capacity = findTotal($event, 'quantity_total');
+                    $sold = findTotal($event, 'quantity_sold');
+                    $ticketType = findTicketType($capacity, $sold);
+                } else {
+                    $sold = "";
+                    $ticketType = "";
+                    $capacity = "";
+                }
+
+                $eventArray = array(
+                    'id' => $id,
+                    'url' => $url,
+                    'name' => $name,
+                    'capacity' => $capacity,
+                    'sold' => $sold,
+                    'ticketType' => $ticketType
+                );
+
+                array_push($newEvents, $eventArray);
+            }
+
+            curl_close($ch);
+
+            return $newEvents;
+
+        } else {
+            debug("error from " . $link);
         }
-
-        curl_close($ch);
-
-        return $newEvents;
     }
 
     function debug($msg) {
@@ -84,26 +115,33 @@
     }
 
     function listEventsData($events) {
-        //initiate table with headers
-        $eventsData = "<table><tr><th>Events</th><th>Status</th></tr>";
+        if(isset($events)) {
+            //initiate table with headers
+            $eventsData = "<table><tr><th>Events</th><th>Status</th></tr>";
 
-        //table contents
-        foreach($events as $event) {
-            $eventsData .= "<tr><td>". $event["name"] . "</td><td>";
+            //table contents
+            foreach($events as $event) {
+                //omit row for event if name or ticketType not set
+                if(isset($event["name"]) && isset($event["ticketType"])) {
+                    $eventsData .= "<tr><td>" . $event["name"] . "</td><td>";
 
-            if($event["ticketType"] == "BUY" || "RUSH") {
-                $eventsData .= "<a href='" . $event["url"] . "' target='_blank'><div class='buyButton'>". $event["ticketType"] ."</div>";
-            } else {
-                $eventsData .= $event["ticketType"];
+                    if($event["ticketType"] == "BUY" || "RUSH") {
+                        $eventsData .= "<a href='" . $event["url"] . "' target='_blank'><div class='buyButton'>". $event["ticketType"] ."</div>";
+                    } else {
+                        $eventsData .= $event["ticketType"];
+                    }
+
+                    $eventsData .= "</td></tr>";
+                }
             }
 
-            $eventsData .= "</td></tr>";
+            //close table
+            $eventsData .= "</table>";
+
+            echo $eventsData;
+        } else {
+            echo "Page could not be loaded!";
         }
-
-        //close table
-        $eventsData .= "</table>";
-
-        echo $eventsData;
     }
 ?>
 
@@ -138,6 +176,12 @@
         </div>
         <div class="divClose" id="page2">
             <?php listEventsData($events2); ?>
+        </div>
+        <!--<div class="divClose" id="page3">
+            <?php listEventsData($events3); ?>
+        </div>-->
+        <div class="divClose" id="page4">
+            <?php listEventsData($events4); ?>
         </div>
     </div>
 </body>
